@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-func Encode(value PhpValue) (result string, err error) {
+func Encode(value interface{}) (result string, err error) {
 	buf := new(bytes.Buffer)
 	err = encodeValue(buf, value)
 	if err == nil {
@@ -15,7 +15,7 @@ func Encode(value PhpValue) (result string, err error) {
 	return
 }
 
-func encodeValue(buf *bytes.Buffer, value PhpValue) (err error) {
+func encodeValue(buf *bytes.Buffer, value interface{}) (err error) {
 	switch t := value.(type) {
 	default:
 		err = fmt.Errorf("Unexpected type %T", t)
@@ -46,7 +46,7 @@ func encodeValue(buf *bytes.Buffer, value PhpValue) (err error) {
 		buf.WriteString("s")
 		buf.WriteRune(TYPE_VALUE_SEPARATOR)
 		encodeString(buf, t)
-	case map[PhpValue]PhpValue:
+	case map[interface{}]interface{}:
 		buf.WriteString("a")
 		buf.WriteRune(TYPE_VALUE_SEPARATOR)
 		err = encodeArrayCore(buf, t)
@@ -69,7 +69,7 @@ func encodeString(buf *bytes.Buffer, strValue string) {
 	buf.WriteRune('"')
 }
 
-func encodeArrayCore(buf *bytes.Buffer, arrValue map[PhpValue]PhpValue) (err error) {
+func encodeArrayCore(buf *bytes.Buffer, arrValue map[interface{}]interface{}) (err error) {
 	valLen := strconv.Itoa(len(arrValue))
 	buf.WriteString(valLen)
 	buf.WriteRune(TYPE_VALUE_SEPARATOR)
@@ -90,7 +90,7 @@ func encodeArrayCore(buf *bytes.Buffer, arrValue map[PhpValue]PhpValue) (err err
 			break
 		}
 		switch v.(type) {
-		case map[PhpValue]PhpValue, *PhpObject:
+		case map[interface{}]interface{}, *PhpObject:
 			//array and object can't end with VALUES_SEPARATOR
 		default:
 			buf.WriteRune(VALUES_SEPARATOR)

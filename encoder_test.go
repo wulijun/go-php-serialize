@@ -5,8 +5,8 @@ import (
 )
 
 func TestEncodeArrayValue2(t *testing.T) {
-	data := make(map[PhpValue]PhpValue)
-	data2 := make(map[PhpValue]PhpValue)
+	data := make(map[interface{}]interface{})
+	data2 := make(map[interface{}]interface{})
 	data2["test"] = true
 	data2["0"] = 5
 	data2["flt32"] = float32(2.3)
