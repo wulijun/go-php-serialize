@@ -1,6 +1,7 @@
 package phpserialize
 
 import (
+	"math"
 	"testing"
 )
 
@@ -55,12 +56,39 @@ func TestDecodeArrayValue2(t *testing.T) {
 		t.Errorf("key arr value type expeted map, get %T", decodeData["arr"])
 	}
 	for k, v := range decodeData2 {
-		if v != data2[k] {
+		if k == "flt32" {
+			if math.Abs(v.(float64)-float64(data2["flt32"].(float32))) > 0.001 {
+				t.Errorf("key arr[%v] value expeted %v, get %v", k, v, data2[k])
+			}
+		} else if v != data2[k] {
 			t.Errorf("key arr[%v] value expeted %v, get %v", k, v, data2[k])
 		}
 	}
+	/*
+		var (
+			stringKey string
+			//normalKey interface{}
+		)
+		stringKey = "flt32"
+		//normalKey = stringKey
+		t.Errorf("%T key %v %v", decodeData2, decodeData2[stringKey], decodeData2["int64"])
+		result = "a:33:{s:4:\"cost\";d:457.00000000000011;s:3:\"uid\";s:9:\"119983495\";i:2332002;d:15;i:2735232;d:15;i:66324;d:14.999999999999998;i:55107;d:14;i:84875;d:14;i:65145;d:15;i:437688;d:15;i:40022;d:14;i:2538364;d:15;i:34701;d:15.000000000000002;i:33490;d:15;i:2813734;d:14;i:1878927;d:15;i:1837284;d:15;i:2735238;d:15;i:437385;d:15;i:44723;d:14;i:2538367;d:15;i:84014;d:15;i:427239;d:15.000000000000002;i:76055;d:15;i:67652;d:14.000000000000002;i:33482;d:15;i:45859;d:14;i:44248;d:14;i:44724;d:15;i:45861;d:15;i:37995;d:15;i:39985;d:15;i:40994;d:15;i:42360;d:15;}"
+		decodeRes, _ = Decode(result)
+		decodeData, _ = decodeRes.(map[interface{}]interface{})
+		for k, v := range decodeData {
+			t.Errorf("%T %v => %T %v", k, k, v, v)
+		}
 
-	/*	t.Errorf("decode %v %v %v %v", err, decodeRes, obj.GetClassName(), privateMemberValue)
+		result = "a:34:{i:66324;d:15;i:67652;d:15;i:427239;d:15;i:437688;d:15;i:1837284;d:15;s:7:\"balance\";d:1617.05;s:5:\"quota\";d:0;i:55107;d:15;i:65145;d:15;i:1878927;d:15;i:2332002;d:15;i:33490;d:15;i:34701;d:15;i:37995;d:15;i:39985;d:15;i:40022;d:15;i:40994;d:15;i:42360;d:15;i:44248;d:15;i:44723;d:15;i:44724;d:15;i:45859;d:15;i:45861;d:15;i:2439794;d:10;i:33482;d:15;i:76055;d:15;i:84014;d:15;i:84875;d:15;i:437385;d:15;i:2538364;d:15;i:2538367;d:15;i:2735232;d:15;i:2735238;d:15;i:2813734;d:15;}"
+		decodeRes, _ = Decode(result)
+		decodeData, _ = decodeRes.(map[interface{}]interface{})
+		for k, v := range decodeData {
+			t.Errorf("%T %v => %T %v", k, k, v, v)
+		}
+
+		t.Errorf("66324 => %v %v balance => %v", decodeData[66324], decodeData[int64(66324)], decodeData["balance"])
+
+		t.Errorf("decode %v %v %v %v", err, decodeRes, obj.GetClassName(), privateMemberValue)
 
 		result, err = Encode(data3)
 		t.Errorf("data %v => %v\n", err, result)
@@ -75,5 +103,6 @@ func TestDecodeArrayValue2(t *testing.T) {
 		result, err = Encode("s\"tr'}e")
 		t.Errorf("data %v => %v\n", err, result)
 		decodeRes, err = Decode(result)
-		t.Errorf("decode %v %v", err, decodeRes)*/
+		t.Errorf("decode %v %v", err, decodeRes)
+	*/
 }
