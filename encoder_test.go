@@ -17,9 +17,16 @@ func TestEncodeArrayValue2(t *testing.T) {
 	data3.SetProtectedMemberValue("b", 3.14)
 	data3.SetPublicMemberValue("c", data2)
 	data["arr"] = data2
-	data["3"] = "str"
+	data["3"] = "s\"tr'}e"
+	data["g"] = nil
 	data["object"] = data3
 
 	result, err := Encode(data)
-	t.Errorf("data %v => %v", err, result)
+	t.Errorf("data %v => %v\n", err, result)
+	result, err = Encode(data3)
+	t.Errorf("data %v => %v\n", err, result)
+	result, err = Encode(nil)
+	t.Errorf("data %v => %v\n", err, result)
+	result, err = Encode("s\"tr'}e")
+	t.Errorf("data %v => %v\n", err, result)
 }

@@ -27,25 +27,33 @@ func encodeValue(buf *bytes.Buffer, value interface{}) (err error) {
 		} else {
 			buf.WriteString("0")
 		}
+		buf.WriteRune(VALUES_SEPARATOR)
+	case nil:
+		buf.WriteString("N")
+		buf.WriteRune(VALUES_SEPARATOR)
 	case int, int64, int32, int16, int8:
 		buf.WriteString("i")
 		buf.WriteRune(TYPE_VALUE_SEPARATOR)
 		strValue := fmt.Sprintf("%v", t)
 		buf.WriteString(strValue)
+		buf.WriteRune(VALUES_SEPARATOR)
 	case float32:
 		buf.WriteString("d")
 		buf.WriteRune(TYPE_VALUE_SEPARATOR)
 		strValue := strconv.FormatFloat(float64(t), 'f', -1, 64)
 		buf.WriteString(strValue)
+		buf.WriteRune(VALUES_SEPARATOR)
 	case float64:
 		buf.WriteString("d")
 		buf.WriteRune(TYPE_VALUE_SEPARATOR)
 		strValue := strconv.FormatFloat(float64(t), 'f', -1, 64)
 		buf.WriteString(strValue)
+		buf.WriteRune(VALUES_SEPARATOR)
 	case string:
 		buf.WriteString("s")
 		buf.WriteRune(TYPE_VALUE_SEPARATOR)
 		encodeString(buf, t)
+		buf.WriteRune(VALUES_SEPARATOR)
 	case map[interface{}]interface{}:
 		buf.WriteString("a")
 		buf.WriteRune(TYPE_VALUE_SEPARATOR)
@@ -85,15 +93,8 @@ func encodeArrayCore(buf *bytes.Buffer, arrValue map[interface{}]interface{}) (e
 				break
 			}
 		}
-		buf.WriteRune(VALUES_SEPARATOR)
 		if err = encodeValue(buf, v); err != nil {
 			break
-		}
-		switch v.(type) {
-		case map[interface{}]interface{}, *PhpObject:
-			//array and object can't end with VALUES_SEPARATOR
-		default:
-			buf.WriteRune(VALUES_SEPARATOR)
 		}
 	}
 	buf.WriteRune('}')
