@@ -87,6 +87,7 @@ func TestDecodeArrayValue2(t *testing.T) {
 		}
 
 		t.Errorf("66324 => %v %v balance => %v", decodeData[66324], decodeData[int64(66324)], decodeData["balance"])
+		//output  66324 => <nil> 15 balance => 1617.05
 
 		t.Errorf("decode %v %v %v %v", err, decodeRes, obj.GetClassName(), privateMemberValue)
 
