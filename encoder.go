@@ -54,15 +54,7 @@ func encodeValue(buf *bytes.Buffer, value interface{}) (err error) {
 		buf.WriteRune(TYPE_VALUE_SEPARATOR)
 		encodeString(buf, t)
 		buf.WriteRune(VALUES_SEPARATOR)
-	case map[interface{}]interface{}:
-		buf.WriteString("a")
-		buf.WriteRune(TYPE_VALUE_SEPARATOR)
-		err = encodeArrayCore(buf, t)
-	case map[string]interface{}:
-		buf.WriteString("a")
-		buf.WriteRune(TYPE_VALUE_SEPARATOR)
-		err = encodeArrayCore(buf, t)
-	case []interface{}:
+	case map[string]interface{}, []interface{}, map[interface{}]interface{}:
 		buf.WriteString("a")
 		buf.WriteRune(TYPE_VALUE_SEPARATOR)
 		err = encodeArrayCore(buf, t)
