@@ -6,18 +6,25 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"golang.org/x/text/encoding"
 )
 
 type PhpDecoder struct {
 	source *strings.Reader
+	encoding *encoding.Decoder
 }
 
-func Decode(value string) (result interface{}, err error) {
+func DecodeWithEncoding(value string, encoding encoding.Encoding) (result interface{}, err error) {
 	decoder := &PhpDecoder{
 		source: strings.NewReader(value),
+		encoding: encoding.NewDecoder(),
 	}
 	result, err = decoder.DecodeValue()
 	return
+}
+
+func Decode(value string) (result interface{}, err error) {
+	return DecodeWithEncoding(value, encoding.Nop)
 }
 
 //all integer is int64，float number is float64
@@ -129,10 +136,15 @@ func (decoder *PhpDecoder) decodeString() (value string, err error) {
 			tmpValue := make([]byte, strLen, strLen)
 			if nRead, _err := decoder.source.Read(tmpValue); _err != nil || nRead != strLen {
 				err = errors.New(fmt.Sprintf("Can not read string content %v. Read only: %v from %v", _err, nRead, strLen))
-			} else {
-				value = string(tmpValue)
-				err = decoder.expect('"')
 			}
+			err = decoder.expect('"')
+			var encoded []byte
+			if encoded, err = decoder.encoding.Bytes(tmpValue); err != nil {
+				return
+			} else {
+				value = string(encoded)
+			}
+
 		}
 	} else {
 		err = errors.New("Can not read string length")
