@@ -58,6 +58,10 @@ func encodeValue(buf *bytes.Buffer, value interface{}) (err error) {
 		buf.WriteString("a")
 		buf.WriteRune(TYPE_VALUE_SEPARATOR)
 		err = encodeArrayCore(buf, t)
+	case map[string]interface{}:
+		buf.WriteString("a")
+		buf.WriteRune(TYPE_VALUE_SEPARATOR)
+		err = encodeArrayCoreMap(buf, t)
 	case *PhpObject:
 		buf.WriteString("O")
 		buf.WriteRune(TYPE_VALUE_SEPARATOR)
@@ -78,6 +82,30 @@ func encodeString(buf *bytes.Buffer, strValue string) {
 }
 
 func encodeArrayCore(buf *bytes.Buffer, arrValue map[interface{}]interface{}) (err error) {
+	valLen := strconv.Itoa(len(arrValue))
+	buf.WriteString(valLen)
+	buf.WriteRune(TYPE_VALUE_SEPARATOR)
+
+	buf.WriteRune('{')
+	for k, v := range arrValue {
+		if intKey, _err := strconv.Atoi(fmt.Sprintf("%v", k)); _err == nil {
+			if err = encodeValue(buf, intKey); err != nil {
+				break
+			}
+		} else {
+			if err = encodeValue(buf, k); err != nil {
+				break
+			}
+		}
+		if err = encodeValue(buf, v); err != nil {
+			break
+		}
+	}
+	buf.WriteRune('}')
+	return err
+}
+
+func encodeArrayCoreMap(buf *bytes.Buffer, arrValue map[string]interface{}) (err error) {
 	valLen := strconv.Itoa(len(arrValue))
 	buf.WriteString(valLen)
 	buf.WriteRune(TYPE_VALUE_SEPARATOR)
