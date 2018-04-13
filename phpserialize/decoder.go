@@ -105,8 +105,12 @@ func (decoder *PhpDecoder) decodeArray() (value map[interface{}]interface{}, err
 					switch t := k.(type) {
 					default:
 						err = fmt.Errorf("Unexpected key type %T", t)
-					case string, int64, float64:
+					case string:
 						value[k] = v
+					case int64:
+						value[int(k.(int64))] = v
+					case float64:
+						value[int(k.(float64))] = v
 					}
 				}
 			}

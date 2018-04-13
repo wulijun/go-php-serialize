@@ -58,6 +58,10 @@ func encodeValue(buf *bytes.Buffer, value interface{}) (err error) {
 		buf.WriteString("a")
 		buf.WriteRune(TYPE_VALUE_SEPARATOR)
 		err = encodeArrayCore(buf, t)
+	case []interface{}:
+		buf.WriteString("a")
+		buf.WriteRune(TYPE_VALUE_SEPARATOR)
+		err = encodeSlice(buf, t)
 	case *PhpObject:
 		buf.WriteString("O")
 		buf.WriteRune(TYPE_VALUE_SEPARATOR)
@@ -99,4 +103,14 @@ func encodeArrayCore(buf *bytes.Buffer, arrValue map[interface{}]interface{}) (e
 	}
 	buf.WriteRune('}')
 	return err
+}
+
+func encodeSlice(buf *bytes.Buffer, sliceValue []interface{}) (err error) {
+	arrValue := make(map[interface{}]interface{}, 0)
+
+	for i, val := range sliceValue {
+		arrValue[i] = val
+	}
+
+	return encodeArrayCore(buf, arrValue)
 }
