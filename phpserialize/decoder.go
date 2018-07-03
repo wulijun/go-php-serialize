@@ -73,7 +73,6 @@ func (decoder *PhpDecoder) DecodeValue() (value interface{}, err error) {
 		}
 	}
 
-	fmt.Printf("%v", err)
 	return value, err
 }
 
