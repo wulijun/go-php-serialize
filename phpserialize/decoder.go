@@ -8,10 +8,12 @@ import (
 	"strings"
 )
 
+// PhpDecoder is decoder structure
 type PhpDecoder struct {
 	source *strings.Reader
 }
 
+// Decode decodes a serialized string
 func Decode(value string) (result interface{}, err error) {
 	decoder := &PhpDecoder{
 		source: strings.NewReader(value),
@@ -20,9 +22,10 @@ func Decode(value string) (result interface{}, err error) {
 	return
 }
 
-//all integer is int64，float number is float64
+//DecodeValue decodes a serialized value (all integer is int64，float number is float64)
 func (decoder *PhpDecoder) DecodeValue() (value interface{}, err error) {
-	if token, _, err := decoder.source.ReadRune(); err == nil {
+	token, _, err := decoder.source.ReadRune()
+	if err == nil {
 		if token == 'N' {
 			err = decoder.expect(VALUES_SEPARATOR)
 			return nil, err
@@ -69,6 +72,7 @@ func (decoder *PhpDecoder) DecodeValue() (value interface{}, err error) {
 			value, err = decoder.decodeObject()
 		}
 	}
+
 	return value, err
 }
 
@@ -95,7 +99,7 @@ func (decoder *PhpDecoder) decodeArray() (value map[interface{}]interface{}, err
 		if arrLen, _err := strconv.Atoi(rawArrlen); _err != nil {
 			err = fmt.Errorf("Can not convert array length %v to int:%v", rawArrlen, _err)
 		} else {
-			decoder.expect('{')
+			err = decoder.expect('{')
 			for i := 0; i < arrLen; i++ {
 				if k, _err := decoder.DecodeValue(); _err != nil {
 					err = fmt.Errorf("Can not read array key %v", _err)
@@ -105,12 +109,16 @@ func (decoder *PhpDecoder) decodeArray() (value map[interface{}]interface{}, err
 					switch t := k.(type) {
 					default:
 						err = fmt.Errorf("Unexpected key type %T", t)
-					case string, int64, float64:
+					case string:
 						value[k] = v
+					case int64:
+						value[int(k.(int64))] = v
+					case float64:
+						value[int(k.(float64))] = v
 					}
 				}
 			}
-			decoder.expect('}')
+			err = decoder.expect('}')
 		}
 	} else {
 		err = errors.New("Can not read array length")
